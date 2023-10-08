@@ -1,0 +1,11 @@
+version: '3'
+services:
+  socket:
+    container_name: socket-residencial-safe
+    build:
+      context: .
+      target: builder
+    ports:
+      - $PORT:$PORT
+    volumes:
+      - ./src:/node-app/src
