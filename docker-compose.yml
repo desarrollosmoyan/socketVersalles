@@ -1,7 +1,7 @@
 version: '3'
 services:
   socket:
-    container_name: socket-residencial-safe
+    container_name: socket-versalles
     build:
       context: .
       target: builder
