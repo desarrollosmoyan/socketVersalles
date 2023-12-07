@@ -54,9 +54,10 @@ export default class Socket {
       this.users.set(userId, socket.id)
       if (typeof cargoId === 'string') {
         this.workersQueue.push(cargoId, userId)
+        console.log('1', this.workersQueue.queue)
       }
 
-      console.log(`USER_ID_CONNECTED: ${userId}`)
+      console.log(`USER_ID_CONNECTED: ${userId}-${cargoId}`)
 
       socket.on('order:new-order', (args: NewOrderArgs) => {
         // remove the worker from the queue
@@ -73,11 +74,13 @@ export default class Socket {
         if (socketId === undefined) return
 
         console.log('NEW_ORDER: ', args)
+        console.log('2', this.workersQueue.queue)
         socket.to(socketId).emit('order:new-order', args)
       })
 
       socket.on('order:finish-order', (args: FinishOrderArgs) => {
         // check if the worker is still connected
+        console.log({ userId })
         const socketId = this.users.get(userId)
         if (socketId === undefined) return
 
@@ -86,12 +89,13 @@ export default class Socket {
         if (order === null) {
           // Push the worker back to the queue
           this.workersQueue.push(args.cargoId, userId)
-
+          console.log('3', this.workersQueue.queue)
           console.log('FINISH_ORDER: ', args)
           return
         }
 
         console.log('NEW_ORDER: ', args)
+        console.log('4', this.workersQueue.queue)
         socket.to(socketId).emit('order:new-order', order)
       })
 
