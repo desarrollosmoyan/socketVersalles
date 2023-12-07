@@ -1,6 +1,6 @@
 FROM node:18-alpine as builder
 
-RUN mkdir /front-app
+RUN mkdir /node-app
 WORKDIR /node-app
 COPY . .
 
