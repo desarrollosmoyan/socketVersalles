@@ -96,13 +96,13 @@ export default class Socket {
 
         console.log('NEW_ORDER: ', args)
         console.log('4', this.workersQueue.queue)
-        socket.to(socketId).emit('order:new-order', order)
+        this.io.to(socketId).emit('order:new-order', order)
       })
 
       socket.on(CONN.DISCONNECTING, () => {
         this.users.delete(userId)
         if (typeof cargoId === 'string') {
-          this.workersQueue.pop(cargoId)
+          this.workersQueue.filter(cargoId, (worker) => worker.userId !== userId)
         }
 
         console.log(`USER_ID_DISCONNECTING: ${userId}`)

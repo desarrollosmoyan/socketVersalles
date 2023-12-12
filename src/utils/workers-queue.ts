@@ -4,34 +4,36 @@ interface Worker {
 }
 
 export default class WorkersQueue {
-  queue = new Map<string, Set<Worker>>()
+  queue: Record<string, Worker[]> = {}
 
   // Add user to a queue
   push(cargoId: string, userId: string) {
-    if (this.queue.has(cargoId)) {
-      const queueByCargo = this.queue.get(cargoId)
-      if (queueByCargo === undefined) {
-        this.queue.set(cargoId, new Set([{ userId, cargoId }]))
-      } else {
-        queueByCargo.add({ userId, cargoId })
-        this.queue.set(cargoId, queueByCargo)
-      }
-    } else {
-      this.queue.set(cargoId, new Set([{ userId, cargoId }]))
+    if (!Array.isArray(this.queue?.[cargoId])) {
+      this.queue[cargoId] = []
     }
+
+    this.queue[cargoId].unshift({ cargoId, userId })
   }
 
   // Get last user from a queue and remove it
   pop(cargoId: string) {
-    const queueByCargo = this.queue.get(cargoId)
-    if (queueByCargo === undefined) return null
+    if (!Array.isArray(this.queue?.[cargoId])) {
+      return null
+    }
 
-    const lastUser = [...queueByCargo].pop()
-    if (lastUser === undefined) return null
+    if (this.queue[cargoId].length === 0) {
+      return null
+    }
 
-    queueByCargo.delete(lastUser)
-    this.queue.set(cargoId, queueByCargo)
+    const worker = this.queue[cargoId].pop()
+    return worker ?? null
+  }
 
-    return lastUser
+  filter(cargoId: string, cb: (worker: Worker) => boolean) {
+    if (!Array.isArray(this.queue?.[cargoId])) {
+      return
+    }
+
+    this.queue[cargoId] = this.queue[cargoId].filter(cb)
   }
 }
